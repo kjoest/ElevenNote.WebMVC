@@ -39,21 +39,40 @@ namespace ElevenNote.WebMVC.Controllers.CategoryController
         //POST: Category/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(CategoryCreate model)
+        public ActionResult Create(Category model)
         {
+            //if (!ModelState.IsValid)
+            //    return View(model);
 
-            if (!ModelState.IsValid)
-                return View(model);
+            //var service = CreateCategoryService();
 
-            var service = CreateCategoryService();
+            //if (service.CreateCategory(model))
+            //{
+            //    TempData["SaveResult"] = "Your category was created.";
+            //    return RedirectToAction("Index");
+            //}
 
-            if (service.CreateCategory(model))
+            //ModelState.AddModelError("", "Category could not be created.");
+            //return View(model);
+
+            if (ModelState.IsValid)
             {
-                TempData["SaveResult"] = "Your category was created.";
-                return RedirectToAction("Index");
+                _db.Categories.Add(model);
+                if (_db.SaveChanges() == 1)
+                {
+                    return Redirect("/Category");
+                }
+                ViewData["ErrorMessage"] = "Couldn't save your categories.";
             }
+            ViewData["ErrorMessage"] = "Model state was invalid";
 
-            ModelState.AddModelError("", "Category could not be created.");
+            var viewModel = new CategoryCreate();
+            viewModel.Notes = _db.Notes.Select(note => new SelectListItem
+            {
+                Text = note.Title,
+                Value = note.NoteId.ToString()
+            });
+
             return View(model);
         }
 
