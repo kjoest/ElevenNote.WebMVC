@@ -18,7 +18,36 @@
     @TempData["SaveResult"]
 </div>
 }
-<table class="table">
+
+<div class="container">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Category ID</th>
+                <th>Category Name</th>
+                <th>Note Title</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var category in Model)
+            {
+                <tr>
+                    <td>@category.CategoryId</td>
+                    <td>@category.CategoryName</td>
+                    <td>@category.Note.Title</td>
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", new { id = category.CategoryId })
+                        @Html.ActionLink("Details", "Details", new { id = category.CategoryId })
+                        @Html.ActionLink("Delete", "Delete", new { id = category.CategoryId })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@*<table class="table">
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.CategoryId)
@@ -46,4 +75,4 @@
         </tr>
     }
 
-</table>
+</table>*@
