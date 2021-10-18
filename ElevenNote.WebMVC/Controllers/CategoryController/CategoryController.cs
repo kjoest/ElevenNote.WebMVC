@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 
@@ -18,8 +19,7 @@ namespace ElevenNote.WebMVC.Controllers.CategoryController
         // GET: Category
         public ActionResult Index()
         {
-            var userId = Guid.Parse(User.Identity.GetUserId());
-            var service = new CategoryService(userId);
+            var service = CreateCategoryService();
             var model = service.GetCategory();
             return View(model);
         }
@@ -27,53 +27,54 @@ namespace ElevenNote.WebMVC.Controllers.CategoryController
         // GET: Category/Create
         public ActionResult Create()
         {
-            var viewModel = new CategoryCreate();
-            viewModel.Notes = _db.Notes.Select(note => new SelectListItem
-            {
-                Text = note.Title,
-                Value = note.NoteId.ToString()
-            });
-            return View(viewModel);
+            //var viewModel = new CategoryCreate();
+            //viewModel.Notes = _db.Notes.Select(note => new SelectListItem
+            //{
+            //    Text = note.Title,
+            //    Value = note.NoteId.ToString()
+            //});
+            return View(/*viewModel*/);
         }
 
         //POST: Category/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Category model)
+        public ActionResult Create(CategoryCreate model)
         {
-            //if (!ModelState.IsValid)
-            //    return View(model);
+            var service = CreateCategoryService();
 
-            //var service = CreateCategoryService();
+            if (!ModelState.IsValid)
+                return View(model);
 
-            //if (service.CreateCategory(model))
-            //{
-            //    TempData["SaveResult"] = "Your category was created.";
-            //    return RedirectToAction("Index");
-            //}
 
-            //ModelState.AddModelError("", "Category could not be created.");
-            //return View(model);
-
-            if (ModelState.IsValid)
+            if (service.CreateCategory(model))
             {
-                _db.Categories.Add(model);
-                if (_db.SaveChanges() == 1)
-                {
-                    return Redirect("/Category");
-                }
-                ViewData["ErrorMessage"] = "Couldn't save your categories.";
+                TempData["SaveResult"] = "Your category was created.";
+                return RedirectToAction("Index");
             }
-            ViewData["ErrorMessage"] = "Model state was invalid";
 
-            var viewModel = new CategoryCreate();
-            viewModel.Notes = _db.Notes.Select(note => new SelectListItem
-            {
-                Text = note.Title,
-                Value = note.NoteId.ToString()
-            });
-
+            ModelState.AddModelError("", "Category could not be created.");
             return View(model);
+
+            //if (ModelState.IsValid)
+            //{
+            //    _db.Categories.Add(model);
+            //    if (_db.SaveChanges() == 1)
+            //    {
+            //        return Redirect("/Category");
+            //    }
+            //    ViewData["ErrorMessage"] = "Couldn't save your categories.";
+            //}
+            //ViewData["ErrorMessage"] = "Model state was invalid";
+
+            //var viewModel = new CategoryCreate();
+            //viewModel.Notes = _db.Notes.Select(note => new SelectListItem
+            //{
+            //    Text = note.Title,
+            //    Value = note.NoteId.ToString()
+            //});
+
+            //return View(model);
         }
 
         // GET: Category/{id}
@@ -81,6 +82,11 @@ namespace ElevenNote.WebMVC.Controllers.CategoryController
         {
             var service = CreateCategoryService();
             var model = service.GetCategoryById(id);
+
+            if(model == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
 
             return View(model);
         }

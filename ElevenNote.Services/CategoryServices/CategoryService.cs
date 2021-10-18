@@ -22,14 +22,15 @@ namespace ElevenNote.Services.CategoryServices
             var entity =
                 new Category()
                 {
+                    OwnerId = _userId,
                     CategoryId = model.CategoryId,
-                    CategoryName = model.CategoryName
+                    CategoryName = model.CategoryName,
                 };
 
             using (var ctx = new ApplicationDbContext())
             {
                 ctx.Categories.Add(entity);
-                return ctx.SaveChanges() > 0;
+                return ctx.SaveChanges() == 1;
             }
         }
 
@@ -40,7 +41,7 @@ namespace ElevenNote.Services.CategoryServices
                 var query =
                     ctx
                     .Categories
-                    .Where(e => e.OwnerId == _userId)
+                    .Where(e => _userId == e.OwnerId)
                     .Select(e =>
                         new CategoryListItem
                         {
@@ -48,7 +49,7 @@ namespace ElevenNote.Services.CategoryServices
                             CategoryName = e.CategoryName
                         });
 
-                return query.ToArray();
+                return query.ToList();
             }
         }
 
@@ -67,7 +68,7 @@ namespace ElevenNote.Services.CategoryServices
                 return new CategoryDetail
                 {
                     CategoryId = entity.CategoryId,
-                    CategoryName = entity.CategoryName
+                    CategoryName = entity.CategoryName,
                 };
             }
         }

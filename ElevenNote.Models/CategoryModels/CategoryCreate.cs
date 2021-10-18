@@ -14,13 +14,6 @@ namespace ElevenNote.Models.CategoryModels
         public int CategoryId { get; set; }
         [Required]
         public string CategoryName { get; set; }
-
         public IEnumerable<SelectListItem> Notes { get; set; }
-
-
-        public override string ToString()
-        {
-            return CategoryName;
-        }
     }
 }

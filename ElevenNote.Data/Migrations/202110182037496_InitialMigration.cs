@@ -7,12 +7,10 @@ namespace ElevenNote.Data.Migrations
     {
         public override void Up()
         {
-            AlterColumn("dbo.Note", "ModifiedUtc", c => c.DateTimeOffset(nullable: false, precision: 7));
         }
         
         public override void Down()
         {
-            AlterColumn("dbo.Note", "ModifiedUtc", c => c.DateTimeOffset(precision: 7));
         }
     }
 }
