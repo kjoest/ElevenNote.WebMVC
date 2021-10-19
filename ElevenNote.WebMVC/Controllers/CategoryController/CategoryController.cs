@@ -92,20 +92,32 @@ namespace ElevenNote.WebMVC.Controllers.CategoryController
         }
 
         // GET: Category/Delete/{id}
+        [ActionName("Delete")]
         public ActionResult Delete(int id)
         {
-            var category = _db.Categories.Find(id);
-            if (category == null)
-                return HttpNotFound();
+            var service = CreateCategoryService();
+            var model = service.GetCategoryById(id);
 
-            return View(category);
+            return View(model);
         }
 
         // POST: Category/Delete/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult DeletePost(int? id)
+        [ActionName("Delete")]
+        public ActionResult DeletePost(int id)
         {
+            //var category = _db.Categories.Find(id);
+            //if(category != null)
+            //{
+            //    _db.Categories.Remove(category);
+            //    TempData["SaveResult"] = "Your category was deleted.";
+            //    return RedirectToAction("Index");
+            //}
+
+            //ModelState.AddModelError("", "Your category could not be delete.");
+            //return View(category);
+
             var category = _db.Categories.Find(id);
             _db.Categories.Remove(category);
             _db.SaveChanges();
@@ -113,33 +125,57 @@ namespace ElevenNote.WebMVC.Controllers.CategoryController
         }
 
         // GET: Category/Edit/{id}
-        public ActionResult Edit(int? id)
+        public ActionResult Edit(int id)
         {
-            var category = _db.Categories.Find(id);
-            if (category == null)
+            var service = CreateCategoryService();
+            var entity = service.GetCategoryById(id);
+            var model =
+                new CategoryEdit
+                {
+                    CategorId = entity.CategoryId,
+                    CategoryName = entity.CategoryName
+                };
+
+            if (model == null)
                 return HttpNotFound();
 
-            ViewData["Notes"] = _db.Notes.Select(note => new SelectListItem
-            {
-                Text = note.Content,
-                Value = note.NoteId.ToString()
-            });
+            return View(model);
 
-            return View(category);
         }
 
         // POST: Category/Edit/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(CategoryEdit category)
+        public ActionResult Edit(int id, CategoryEdit model)
         {
-            if (ModelState.IsValid)
+            //if (ModelState.IsValid)
+            //{
+            //    _db.Entry(category).State = EntityState.Modified;
+            //    _db.SaveChanges();
+            //    return RedirectToAction("Index");
+            //}
+            //return View(category);
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            if(model.CategorId != id)
             {
-                _db.Entry(category).State = EntityState.Modified;
-                _db.SaveChanges();
+                ModelState.AddModelError("", "ID Mistatch");
+                return View(model);             
+            }
+
+            var service = CreateCategoryService();
+
+            if (service.UpdateCategory(model))
+            {
+                TempData["SaveResult"] = "Your category was updated";
                 return RedirectToAction("Index");
             }
-            return View(category);
+
+            ModelState.AddModelError("", "Your category could not be updated.");
+            return View(model);
+
         }
 
         private CategoryService CreateCategoryService()

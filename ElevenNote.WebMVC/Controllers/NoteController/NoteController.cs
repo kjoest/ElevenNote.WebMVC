@@ -80,7 +80,7 @@ namespace ElevenNote.WebMVC.Controllers.NoteController
 
             if (model.NoteId != id)
             {
-                ModelState.AddModelError("", "Id Mismatch");
+                ModelState.AddModelError("", "ID Mismatch");
                 return View(model);
             }
 
@@ -93,7 +93,7 @@ namespace ElevenNote.WebMVC.Controllers.NoteController
             }
 
             ModelState.AddModelError("", "Your note could not be updated.");
-            return View();
+            return View(model);
         }
 
         [ActionName("Delete")]
